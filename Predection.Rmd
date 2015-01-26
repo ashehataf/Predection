@@ -1,0 +1,47 @@
+---
+title: "ClassePredection"
+author: "aShehata"
+date: "Sunday, January 25, 2015"
+output: html_document
+---
+
+Data Loading
+
+```{r cache=TRUE, echo=FALSE}
+setwd('D:/DataScience/Coursera/1 - Data Science - Specialization/8 - Practical Machine Learning 4H-9M/project')
+
+data <- read.csv("pml-training.csv")
+cases <- read.csv("pml-testing.csv")
+#I am loading only some specific columns which has no 'NA' or empty values
+d <- data[, c(1,2,3,4,7,8,9,10,11,37,38,39,40,41,42,43,44,45,46,47,48,49,60,61,62,63,64,65,66,67,68,84,85,86,102,113,114,115,116,117,118,119,120,121,122,123,124,140,151,152,153,154,155,156,157,158,159,160)]
+
+t <- data[, c(1,2,3,4,7,8,9,10,11,37,38,39,40,41,42,43,44,45,46,47,48,49,60,61,62,63,64,65,66,67,68,84,85,86,102,113,114,115,116,117,118,119,120,121,122,123,124,140,151,152,153,154,155,156,157,158,159,160)]
+```
+
+Exploratory Data Analysis & graphs
+```{r}
+library(caret)
+library(ggplot2)
+
+qplot(magnet_forearm_x, magnet_forearm_y, col=classe,data=d)
+qplot(magnet_forearm_y, magnet_forearm_z, col=classe,data=d)
+qplot(magnet_belt_y, magnet_belt_z, col=classe,data=d)
+
+qplot(magnet_forearm_x, num_window, col=classe,data=d)
+qplot(magnet_forearm_y, num_window, col=classe,data=d)
+
+qplot(magnet_belt_y, num_window, col=classe,data=d)
+qplot(magnet_belt_z, num_window, col=classe,data=d)
+```
+
+Preparing training & testing data sets
+
+```{r, echo=FALSE}
+inTrain <- createDataPartition(d$classe, p = 0.75, list = FALSE)
+training <- d[inTrain,]
+testing <- d[-inTrain,]
+set.seed(123)
+modelFit <- train(classe~magnet_belt_y, data = training)
+predictions <- predict(modelFit, newdata=testing)
+confusionMatrix(predictions, testing$classe)
+```
